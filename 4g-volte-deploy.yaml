@@ -1,4 +1,12 @@
 services:
+  redis:
+    image: redis:7.0
+    container_name: redis
+    expose:
+      - "6379/tcp"
+    networks:
+      default:
+        ipv4_address: 172.22.0.200
   mongo:
     image: mongo:6.0
     container_name: mongo
@@ -17,7 +25,7 @@ services:
       default:
         ipv4_address: ${MONGO_IP}
   webui:
-    image: docker_open5gs
+    image: ghcr.io/MkSib/docker_open5gs
     container_name: webui
     depends_on:
       - mongo
@@ -37,7 +45,7 @@ services:
       default:
         ipv4_address: ${WEBUI_IP}
   hss:
-    image: docker_open5gs
+    image: ghcr.io/MkSib/docker_open5gs
     container_name: hss
     env_file:
       - .env
@@ -59,7 +67,7 @@ services:
       default:
         ipv4_address: ${HSS_IP}
   sgwc:
-    image: docker_open5gs
+    image: ghcr.io/MkSib/docker_open5gs
     depends_on:
       - smf
       - upf
@@ -80,7 +88,7 @@ services:
       default:
         ipv4_address: ${SGWC_IP}
   sgwu:
-    image: docker_open5gs
+    image: ghcr.io/MkSib/docker_kamailio
     depends_on:
       - smf
       - upf
@@ -97,13 +105,13 @@ services:
     expose:
       - "8805/udp"
       - "2152/udp"
-    # ports:
-    #   - "2152:2152/udp"
+    ports:
+      - "2152:2152/udp"
     networks:
       default:
         ipv4_address: ${SGWU_IP}
   smf:
-    image: docker_open5gs
+    image: ghcr.io/MkSib/docker_open5gs
     container_name: smf
     env_file:
       - .env
@@ -128,7 +136,7 @@ services:
       default:
         ipv4_address: ${SMF_IP}
   upf:
-    image: docker_open5gs
+    image: ghcr.io/MkSib/docker_open5gs
     depends_on:
       - smf
     container_name: upf
@@ -180,8 +188,8 @@ services:
       - "36412/sctp"
       - "2123/udp"
       - "9091/tcp"
-    # ports:
-    #   - "36412:36412/sctp"
+    ports:
+      - "36412:36412/sctp"
     networks:
       default:
         ipv4_address: ${MME_IP}
@@ -280,6 +288,7 @@ services:
     depends_on:
       - dns
       - mysql
+      - redis
     expose:
       - "${PYHSS_BIND_PORT}/tcp"
       - "${PYHSS_BIND_PORT}/sctp"
@@ -290,7 +299,7 @@ services:
       default:
         ipv4_address: ${PYHSS_IP}
   icscf:
-    image: docker_kamailio
+    image: noeldias02/docker_kamailio
     container_name: icscf
     dns: ${DNS_IP}
     volumes:
@@ -314,7 +323,7 @@ services:
       default:
         ipv4_address: ${ICSCF_IP}
   scscf:
-    image: docker_kamailio
+    image: ghcr.io/MkSib/docker_kamailio
     container_name: scscf
     dns: ${DNS_IP}
     volumes:
@@ -338,7 +347,7 @@ services:
       default:
         ipv4_address: ${SCSCF_IP}
   pcscf:
-    image: docker_kamailio
+    image: ghcr.io/MkSib/docker_kamailio
     container_name: pcscf
     dns: ${DNS_IP}
     privileged: true
@@ -372,7 +381,7 @@ services:
       default:
         ipv4_address: ${PCSCF_IP}
   smsc:
-    image: docker_kamailio
+    image: ghcr.io/MkSib/docker_kamailio
     container_name: smsc
     dns: ${DNS_IP}
     volumes:
@@ -394,7 +403,7 @@ services:
         ipv4_address: ${SMSC_IP}
   osmomsc:
     build: ./osmomsc
-    image: docker_osmomsc
+    image: ghcr.io/MkSib/docker_osmomsc
     container_name: osmomsc
     volumes:
       - ./osmomsc:/mnt/osmomsc
@@ -414,7 +423,7 @@ services:
         ipv4_address: ${OSMOMSC_IP}
   osmohlr:
     build: ./osmohlr
-    image: docker_osmohlr
+    image: ghcr.io/MkSib/docker_osmohlr
     container_name: osmohlr
     volumes:
       - ./osmohlr:/mnt/osmohlr
@@ -431,7 +440,7 @@ services:
         ipv4_address: ${OSMOHLR_IP}
   metrics:
     build: ./metrics
-    image: docker_metrics
+    image: ghcr.io/MkSib/docker_metrics
     container_name: metrics
     env_file:
       - .env
