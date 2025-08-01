@@ -1,12 +1,4 @@
 services:
-  redis:
-    image: redis:7.0
-    container_name: redis
-    expose:
-      - "6379/tcp"
-    networks:
-      default:
-        ipv4_address: 172.22.0.200
   mongo:
     image: mongo:6.0
     container_name: mongo
@@ -25,7 +17,7 @@ services:
       default:
         ipv4_address: ${MONGO_IP}
   webui:
-    image: ghcr.io/herlesupreeth/docker_open5gs:master
+    image: docker_open5gs
     container_name: webui
     depends_on:
       - mongo
@@ -34,7 +26,7 @@ services:
     environment:
       - COMPONENT_NAME=webui
     volumes:
-      - ./webui:/home/bbu/docker_open5gs/webui
+      - ./webui:/mnt/webui
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     expose:
@@ -45,14 +37,14 @@ services:
       default:
         ipv4_address: ${WEBUI_IP}
   hss:
-    image: ghcr.io/herlesupreeth/docker_open5gs:master
+    image: docker_open5gs
     container_name: hss
     env_file:
       - .env
     environment:
       - COMPONENT_NAME=hss
     volumes:
-      - ./hss:/home/bbu/docker_open5gs/hss
+      - ./hss:/mnt/hss
       - ./log:/open5gs/install/var/log/open5gs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -67,7 +59,7 @@ services:
       default:
         ipv4_address: ${HSS_IP}
   sgwc:
-    image: ghcr.io/herlesupreeth/docker_open5gs:master
+    image: docker_open5gs
     depends_on:
       - smf
       - upf
@@ -77,7 +69,7 @@ services:
     environment:
       - COMPONENT_NAME=sgwc
     volumes:
-      - ./sgwc:/home/bbu/docker_open5gs/sgwc
+      - ./sgwc:/mnt/sgwc
       - ./log:/open5gs/install/var/log/open5gs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -88,7 +80,7 @@ services:
       default:
         ipv4_address: ${SGWC_IP}
   sgwu:
-    image: ghcr.io/herlesupreeth/docker_kamailio:master
+    image: docker_open5gs
     depends_on:
       - smf
       - upf
@@ -98,7 +90,7 @@ services:
     environment:
       - COMPONENT_NAME=sgwu
     volumes:
-      - ./sgwu:/home/bbu/docker_open5gs/sgwu
+      - ./sgwu:/mnt/sgwu
       - ./log:/open5gs/install/var/log/open5gs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -111,7 +103,7 @@ services:
       default:
         ipv4_address: ${SGWU_IP}
   smf:
-    image: ghcr.io/herlesupreeth/docker_open5gs:master
+    image: docker_open5gs
     container_name: smf
     env_file:
       - .env
@@ -119,7 +111,7 @@ services:
       - COMPONENT_NAME=smf
       - DEPLOY_MODE=4G
     volumes:
-      - ./smf:/home/bbu/docker_open5gs/smf
+      - ./smf:/mnt/smf
       - ./log:/open5gs/install/var/log/open5gs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -136,7 +128,7 @@ services:
       default:
         ipv4_address: ${SMF_IP}
   upf:
-    image: ghcr.io/herlesupreeth/docker_open5gs:master
+    image: docker_open5gs
     depends_on:
       - smf
     container_name: upf
@@ -145,7 +137,7 @@ services:
     environment:
       - COMPONENT_NAME=upf
     volumes:
-      - ./upf:/home/bbu/docker_open5gs/upf
+      - ./upf:/mnt/upf
       - ./log:/open5gs/install/var/log/open5gs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -162,7 +154,7 @@ services:
       default:
         ipv4_address: ${UPF_IP}
   mme:
-    image: ghcr.io/herlesupreeth/docker_open5gs:master
+    image: docker_open5gs
     depends_on:
       - hss
       - sgwc
@@ -176,7 +168,7 @@ services:
     environment:
       - COMPONENT_NAME=mme
     volumes:
-      - ./mme:/home/bbu/docker_open5gs/mme
+      - ./mme:/mnt/mme
       - ./log:/open5gs/install/var/log/open5gs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -194,7 +186,7 @@ services:
       default:
         ipv4_address: ${MME_IP}
   pcrf:
-    image: ghcr.io/herlesupreeth/docker_open5gs:master
+    image: docker_open5gs
     container_name: pcrf
     env_file:
       - .env
@@ -203,7 +195,7 @@ services:
     depends_on:
       - mongo
     volumes:
-      - ./pcrf:/home/bbu/docker_open5gs/pcrf
+      - ./pcrf:/mnt/pcrf
       - ./log:/open5gs/install/var/log/open5gs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -217,12 +209,12 @@ services:
         ipv4_address: ${PCRF_IP}
   dns:
     build: ./dns
-    image: ghcr.io/herlesupreeth/docker_dns:master
+    image: docker_dns
     container_name: dns
     env_file:
       - .env
     volumes:
-      - ./dns:/home/bbu/docker_open5gs/dns
+      - ./dns:/mnt/dns
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     expose:
@@ -232,13 +224,13 @@ services:
         ipv4_address: ${DNS_IP}
   rtpengine:
     build: ./rtpengine
-    image: ghcr.io/herlesupreeth/docker_rtpengine:master
+    image: docker_rtpengine
     container_name: rtpengine
     privileged: true
     env_file:
       - .env
     volumes:
-      - ./rtpengine:/home/bbu/docker_open5gs/rtpengine
+      - ./rtpengine:/mnt/rtpengine
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     cap_add:
@@ -260,7 +252,7 @@ services:
         ipv4_address: ${RTPENGINE_IP}
   mysql:
     build: ./mysql
-    image: ghcr.io/herlesupreeth/docker_mysql:master
+    image: docker_mysql
     container_name: mysql
     env_file:
       - .env
@@ -275,11 +267,11 @@ services:
         ipv4_address: ${MYSQL_IP}
   pyhss:
     build: ./pyhss
-    image: ghcr.io/herlesupreeth/docker_pyhss:master
+    image: docker_pyhss
     container_name: pyhss
     dns: ${DNS_IP}
     volumes:
-      - ./pyhss:/home/bbu/docker_open5gs/pyhss
+      - ./pyhss:/mnt/pyhss
       - ./pyhss/logs:/pyhss/log/
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -288,7 +280,6 @@ services:
     depends_on:
       - dns
       - mysql
-      - redis
     expose:
       - "${PYHSS_BIND_PORT}/tcp"
       - "${PYHSS_BIND_PORT}/sctp"
@@ -299,11 +290,11 @@ services:
       default:
         ipv4_address: ${PYHSS_IP}
   icscf:
-    image: ghcr.io/herlesupreeth/docker_kamailio:master
+    image: docker_kamailio
     container_name: icscf
     dns: ${DNS_IP}
     volumes:
-      - ./icscf:/home/bbu/docker_open5gs/icscf
+      - ./icscf:/mnt/icscf
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     env_file:
@@ -323,11 +314,11 @@ services:
       default:
         ipv4_address: ${ICSCF_IP}
   scscf:
-    image: ghcr.io/herlesupreeth/docker_kamailio:master
+    image: docker_kamailio
     container_name: scscf
     dns: ${DNS_IP}
     volumes:
-      - ./scscf:/home/bbu/docker_open5gs/scscf
+      - ./scscf:/mnt/scscf
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     env_file:
@@ -347,14 +338,14 @@ services:
       default:
         ipv4_address: ${SCSCF_IP}
   pcscf:
-    image: ghcr.io/herlesupreeth/docker_kamailio:master
+    image: docker_kamailio
     container_name: pcscf
     dns: ${DNS_IP}
     privileged: true
     cap_add:
       - NET_ADMIN
     volumes:
-      - ./pcscf:/home/bbu/docker_open5gs/pcscf
+      - ./pcscf:/mnt/pcscf
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     env_file:
@@ -381,11 +372,11 @@ services:
       default:
         ipv4_address: ${PCSCF_IP}
   smsc:
-    image: ghcr.io/herlesupreeth/docker_kamailio:master
+    image: docker_kamailio
     container_name: smsc
     dns: ${DNS_IP}
     volumes:
-      - ./smsc:/home/bbu/docker_open5gs/smsc
+      - ./smsc:/mnt/smsc
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     env_file:
@@ -403,10 +394,10 @@ services:
         ipv4_address: ${SMSC_IP}
   osmomsc:
     build: ./osmomsc
-    image: ghcr.io/herlesupreeth/docker_osmomsc:master
+    image: docker_osmomsc
     container_name: osmomsc
     volumes:
-      - ./osmomsc:/home/bbu/docker_open5gs/osmomsc
+      - ./osmomsc:/mnt/osmomsc
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     env_file:
@@ -423,10 +414,10 @@ services:
         ipv4_address: ${OSMOMSC_IP}
   osmohlr:
     build: ./osmohlr
-    image: ghcr.io/herlesupreeth/docker_osmohlr:master
+    image: docker_osmohlr
     container_name: osmohlr
     volumes:
-      - ./osmohlr:/home/bbu/docker_open5gs/osmohlr
+      - ./osmohlr:/mnt/osmohlr
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     env_file:
@@ -440,12 +431,12 @@ services:
         ipv4_address: ${OSMOHLR_IP}
   metrics:
     build: ./metrics
-    image: ghcr.io/herlesupreeth/docker_metrics:master
+    image: docker_metrics
     container_name: metrics
     env_file:
       - .env
     volumes:
-      - ./metrics:/home/bbu/docker_open5gs/metrics
+      - ./metrics:/mnt/metrics
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     expose:
@@ -463,7 +454,7 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/:/etc/grafana/provisioning/
-      - ./grafana:/home/bbu/docker_open5gs/grafana
+      - ./grafana:/mnt/grafana
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     environment:
